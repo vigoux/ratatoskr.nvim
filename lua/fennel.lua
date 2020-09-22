@@ -2285,7 +2285,7 @@ package.preload["fennel.parser"] = package.preload["fennel.parser"] or function(
     return ((b == 32) or ((b >= 9) and (b <= 13)))
   end
   local function symbolchar_3f(b)
-    return ((b > 32) and not delims[b] and (b ~= 127) and (b ~= 34) and (b ~= 39) and (b ~= 126) and (b ~= 59) and (b ~= 44) and (b ~= 64) and (b ~= 96))
+    return ((b > 32) and not delims[b] and (b ~= 127) and (b ~= 34) and (b ~= 39) and (b ~= 126) and (b ~= 59) and (b ~= 44) and (b ~= 96))
   end
   local prefixes = {[35] = "hashfn", [39] = "quote", [44] = "unquote", [96] = "quote"}
   local function parser(getbyte, filename, options)
