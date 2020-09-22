@@ -1,8 +1,11 @@
 (import-macros m "ratatoskr.macros")
 
 (var parser (vim.treesitter.get_parser))
-
-(each [id node
-       (: (m.ts (. parser "lang") (identifier) @id) "iter_captures"
-        (: (parser:parse) "root") 0 0 (vim.api.nvim_buf_line_count 0))]
-  (print (node:type)))
+(let [root (: (parser:parse) :root)
+      lang (. parser "lang")
+      lcount (vim.api.nvim_buf_line_count 0)]
+  (m.matches root 0 0 lcount lang [(identifier) @id (number) @num]
+             (if @num
+               (print "BAAAR" (@num:type)))
+             (if @id
+               (print (@id:type)))))
