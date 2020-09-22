@@ -1,3 +1,3 @@
 if has("nvim")
-  lua require("ratatoskr.init")
+  lua require("fennel-setup")
 endif
