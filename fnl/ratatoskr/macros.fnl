@@ -6,6 +6,8 @@
   `((. (require "vim.treesitter.query") :parse_query) ,lang ,acc))
 
 (fn code_trans_at [ m query get_fn ... ]
+  "Replaces every occurence of @{capt} in a tree by calls like (get_fn m query {capt})
+  this is used to extract capture names from a query"
   (var out_code (list))
   (each [_ outer (ipairs [ ... ])]
     (each [index item (ipairs outer)]
@@ -41,8 +43,7 @@
   out_code)
 
 (fn matches [ node bufnr start end query ... ]
-  (let [capture_names {}
-        match_sym (sym "tsmatch")
+  (let [match_sym (sym "tsmatch")
         q_name (gensym)
         get_fn_name (gensym)]
 
@@ -54,5 +55,39 @@
        (each [pattern# ,match_sym (: ,q_name "iter_matches" ,node ,bufnr ,start ,end)]
          ,(code_trans_at match_sym q_name get_fn_name ...)))))
 
+(fn edit [ bufnr query ... ]
+    (let [parser_sym (gensym)
+          root_sym (gensym)
+          lang_sym (gensym)
+          lcount_sym (gensym)
+          query_sym (gensym)
+          replace_sym (sym "replace")
+          text_sym (sym "text")
+          edits_sym (gensym)]
+
+      (var replace_fn
+        `(fn ,replace_sym [node# replacement#]
+            (let [(nsl# nsc# nel# nec#) (: node# :range)]
+              (table.insert ,edits_sym
+                {:range {:start { :line nsl# :character nsc# }
+                         :end   { :line nel# :character nec# }}
+                 :newText replacement#}))))
+
+      (var text_fn
+           `(fn ,text_sym [node#]
+                (vim.treesitter.query.get_node_text node# ,bufnr)))
+
+      `(let [,parser_sym (vim.treesitter.get_parser ,bufnr)
+             ,root_sym (-> ,parser_sym (: :parse) (. 1) (: :root))
+             ,lang_sym (: ,parser_sym "lang")
+             ,lcount_sym (vim.api.nvim_buf_line_count ,bufnr)
+             ,query_sym ,(ts_query lang_sym query)
+             ,edits_sym []]
+         ,text_fn
+         ,replace_fn
+         ,(matches root_sym bufnr 0 lcount_sym query_sym ...)
+        (vim.lsp.util.apply_text_edits ,edits_sym ,bufnr))))
+
 {:ts ts_query
- :matches matches}
+ :matches matches
+ :edit edit}
