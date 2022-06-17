@@ -36,6 +36,35 @@ Here is for example a code replacing all identifiers with the text
       (replace @id "foo")))
 ```
 
+As you can see, the code and the edition are seemlessly integrated.
+Within the `edit` call, the following function are provided:
+- `(replace node text)` replaces `node` with `text`
+- `(text node)` gets the text corresponding to the current node
+
+Please not that all `@...` are replaced by the node they point to, and
+that, because of how queries work, some may be `nil`. It is thus
+considered a good practice to always check whether a node is `nil`
+before using it.
+
+# TODOs
+
+## Templating for queries.
+
+One neat thing would be to have query templates, something like the
+following:
+
+```fennel
+;; Declares a query
+(query lang
+  (if foo
+    (t [ (identifier) @bar ])
+    (t [ (identifier) @foo ]))
+
+  ;; Some better templating ?
+  (each [_ v [ "a" "b" "c" ]]
+    (t [ (identifier) @%s ] v)))
+```
+
 # Acknowledgements
 
 Thanks @runiq for the name
