@@ -86,7 +86,7 @@
          ,text_fn
          ,replace_fn
          ,(matches root_sym bufnr 0 lcount_sym query_sym ...)
-        (vim.lsp.util.apply_text_edits ,edits_sym ,bufnr))))
+        (vim.lsp.util.apply_text_edits ,edits_sym ,bufnr "utf-8"))))
 
 {:ts ts_query
  :matches matches
