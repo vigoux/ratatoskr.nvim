@@ -50,7 +50,7 @@
     (var get_fn `(fn ,get_fn_name [m# q# a#] (. m# (. (. q# :captures) a#))))
 
     `(let [,q_name ,query]
-       (vim.tbl_add_reverse_lookup (. ,q_name "captures"))
+       (pcall vim.tbl_add_reverse_lookup (. ,q_name "captures"))
        ,get_fn
        (each [pattern# ,match_sym (: ,q_name "iter_matches" ,node ,bufnr ,start ,end)]
          ,(code_trans_at match_sym q_name get_fn_name ...)))))
